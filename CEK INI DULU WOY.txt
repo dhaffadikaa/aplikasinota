@@ -4,3 +4,12 @@ tolong kasih nama file
 [No page]_[nama page].java
 contoh : 
 1_ListNota.java
+
+KALAU NGEPUSH SESUATU NGOMONG DI GRUP
+contoh :
+"Guys aku habis ngepush buat page listnota ya"
+
+JANGAN LUPA KASIH PESAN COMMIT YANG JELAS PAS NGEPUSH
+BIAR MUDAH DI TRACKING
+contoh :
+"Perbaikan bug page ListNota" 
