@@ -12,7 +12,7 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 /**
  *\
- * testing nama github baru
+ * testing nama github baru lagi
  * @author DHAFFA
  */
 public class ListNota_1 extends javax.swing.JFrame {
