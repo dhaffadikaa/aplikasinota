@@ -2,22 +2,100 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 /**
  *
  * @author DHAFFA
  */
 public class ListNota_1 extends javax.swing.JFrame {
+    public ListNota_1() {
+    initComponents();
+    loadData(); 
+   
+}   
+    private void loadData() {
+    DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+    model.setRowCount(0); 
+
+    String url = "jdbc:sqlserver://localhost:1433;databaseName=DbNotaku;encrypt=true;trustServerCertificate=true;";
+    String user = "Test1"; 
+    String password = "123"; 
+
+    String query = "SELECT * FROM Nota";
+
+    try (Connection conn = DriverManager.getConnection(url, user, password);
+         Statement stmt = conn.createStatement();
+         ResultSet rs = stmt.executeQuery(query)) {
+
+        while (rs.next()) {
+            String noNota = rs.getString("no_nota");
+            String namaToko = rs.getString("nama_toko");
+            String alamat = rs.getString("alamat");
+            String tanggal = rs.getString("tanggal");
+
+            model.addRow(new Object[]{noNota, namaToko, alamat, tanggal});
+        }
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Gagal memuatkan data: " + e.getMessage(), "Ralat", JOptionPane.ERROR_MESSAGE);
+    }
+}
+    private void btnTambahActionPerformed(java.awt.event.ActionEvent evt) {                                          
+
+    UpdateNota_3 halamanTambah = new UpdateNota_3();
+    halamanTambah.setVisible(true);
+
+    this.dispose(); 
+}
+    private void btnHapusActionPerformed(java.awt.event.ActionEvent evt) {                                         
+  
+    int selectedRow = jTable1.getSelectedRow();
     
+    if (selectedRow == -1) {
+        JOptionPane.showMessageDialog(this, "Sila pilih baris nota yang ingin dihapus terlebih dahulu!");
+        return;
+    }
+
+    String noNota = jTable1.getValueAt(selectedRow, 0).toString();
+
+    int confirm = JOptionPane.showConfirmDialog(this, 
+            "Adakah anda pasti ingin menghapus Nota " + noNota + "?\nSemua detail barang di dalamnya juga akan terhapus.", 
+            "Pengesahan Hapus", JOptionPane.YES_NO_OPTION);
+
+    if (confirm == JOptionPane.YES_OPTION) {
+        String url = "jdbc:sqlserver://localhost:1433;databaseName=DbNotaku;encrypt=true;trustServerCertificate=true;";
+        String user = "sa";
+        String password = "password_anda"; 
+        
+        String sql = "DELETE FROM Nota WHERE no_nota = ?";
+
+        try (Connection conn = DriverManager.getConnection(url, user, password);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setString(1, noNota);
+            ps.executeUpdate();
+
+            JOptionPane.showMessageDialog(this, "Nota Berhasil Dihapus!");
+            
+            loadData(); 
+            
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Gagal menghapus nota: " + e.getMessage(), "Ralat", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+}
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ListNota_1.class.getName());
 
     /**
      * Creates new form ListNota
      */
-    public ListNota_1() {
-        initComponents();
-    }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -57,8 +135,8 @@ public class ListNota_1 extends javax.swing.JFrame {
         jTable1.setFont(new java.awt.Font("Yu Gothic UI Semibold", 0, 12)); // NOI18N
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
+                {"asd", "asd", "as", "asd"},
+                {"asdadsa", "dasdasd", "asd", null},
                 {null, null, null, null},
                 {null, null, null, null}
             },
