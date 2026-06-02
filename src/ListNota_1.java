@@ -11,7 +11,8 @@ import java.sql.SQLException;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 /**
- *
+ *\
+ * testing nama github baru
  * @author DHAFFA
  */
 public class ListNota_1 extends javax.swing.JFrame {
