@@ -2,20 +2,101 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
-
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 /**
  *
  * @author WINDOWS
  */
-public class UpdateNota_3 extends javax.swing.JPanel {
+public class UpdateNota_3 extends javax.swing.JFrame {
+    private String selectedNoNota;
+    
+    private final String url = "jdbc:sqlserver://localhost:1433;databaseName=DbNotaku;encrypt=true;trustServerCertificate=true;";
+    private final String userDb = "Test1";
+    private final String passDb = "123";
+    private boolean isEditingMode = false;
+    private boolean isAddingMode = false;
 
-    /**
-     * Creates new form UpdateNota_3
-     */
     public UpdateNota_3() {
         initComponents();
+        customTableSetup();
+        this.setSize(600, 500);
+        this.setLocationRelativeTo(null);
     }
 
+    public UpdateNota_3(String noNota) {
+        initComponents();
+        this.selectedNoNota = noNota;
+        customTableSetup();
+        
+        this.setSize(600, 500);
+        this.setLocationRelativeTo(null);
+        
+        NomerNota.setText(selectedNoNota);
+        NomerNota.setEditable(false); 
+        
+        loadDetailData(); 
+    }
+    
+    private void customTableSetup() {
+        DefaultTableModel customModel = new DefaultTableModel(
+            new Object [][] {},
+            new String [] { "Jumlah", "Nama Barang", "Harga Satuan", "SubTotal", "ID_Detail" }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class
+            };
+            boolean[] canEdit = new boolean [] { true, true, true, false, false };
+
+            @Override
+            public Class getColumnClass(int columnIndex) { return types [columnIndex]; }
+
+            @Override
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                if ((isEditingMode || isAddingMode) && rowIndex == jTable2.getSelectedRow()) {
+                    return canEdit[columnIndex];
+                }
+                return false;
+            }
+        };
+        
+        jTable2.setModel(customModel);
+        
+        jTable2.getColumnModel().getColumn(4).setMinWidth(0);
+        jTable2.getColumnModel().getColumn(4).setMaxWidth(0);
+        jTable2.getColumnModel().getColumn(4).setWidth(0);
+    }
+
+   private void loadDetailData() {
+        DefaultTableModel model = (DefaultTableModel) jTable2.getModel();
+        model.setRowCount(0); 
+        
+        String query = "SELECT id_detail, jumlah, nama_barang, harga_satuan, total_harga FROM DetailNota WHERE no_nota = ?";
+        
+        try (Connection conn = DriverManager.getConnection(url, userDb, passDb);
+             PreparedStatement ps = conn.prepareStatement(query)) {
+            
+            ps.setString(1, selectedNoNota);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    model.addRow(new Object[]{
+                        rs.getInt("jumlah"),
+                        rs.getString("nama_barang"),
+                        rs.getInt("harga_satuan"),
+                        rs.getInt("total_harga"),
+                        rs.getInt("id_detail")
+                    });
+                }
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Gagal memuat data: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -27,9 +108,11 @@ public class UpdateNota_3 extends javax.swing.JPanel {
 
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable2 = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jTextField1 = new javax.swing.JTextField();
+        HomeButton = new javax.swing.JButton();
+        HapusItemButton = new javax.swing.JButton();
+        TambahItemButton = new javax.swing.JButton();
+        EditItemButton = new javax.swing.JButton();
+        NomerNota = new javax.swing.JTextField();
         Background = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(255, 255, 255));
@@ -37,20 +120,20 @@ public class UpdateNota_3 extends javax.swing.JPanel {
 
         jTable2.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
             },
             new String [] {
-                "Jumlah", "Nama Barang", "Harga Satuan", "SubTotal", "Action"
+                "Jumlah", "Nama Barang", "Harga Satuan", "SubTotal"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Object.class
+                java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                true, true, true, false, true
+                true, true, true, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -65,46 +148,214 @@ public class UpdateNota_3 extends javax.swing.JPanel {
 
         add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 70, 540, 320));
 
-        jButton1.setBackground(new java.awt.Color(255, 87, 87));
-        jButton1.setFont(new java.awt.Font("Tw Cen MT Condensed Extra Bold", 0, 12)); // NOI18N
-        jButton1.setText("HOME");
-        jButton1.addActionListener(this::jButton1ActionPerformed);
-        add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 410, 130, 30));
+        HomeButton.setBackground(new java.awt.Color(0, 204, 204));
+        HomeButton.setFont(new java.awt.Font("Tw Cen MT Condensed Extra Bold", 0, 12)); // NOI18N
+        HomeButton.setText("KEMBALI");
+        HomeButton.addActionListener(this::HomeButtonActionPerformed);
+        add(HomeButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 410, 80, 30));
 
-        jButton2.setBackground(new java.awt.Color(204, 255, 255));
-        jButton2.setFont(new java.awt.Font("Tw Cen MT Condensed Extra Bold", 0, 12)); // NOI18N
-        jButton2.setText("TAMBAH ITEM");
-        jButton2.addActionListener(this::jButton2ActionPerformed);
-        add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 410, 130, 30));
+        HapusItemButton.setBackground(new java.awt.Color(255, 102, 102));
+        HapusItemButton.setFont(new java.awt.Font("Tw Cen MT Condensed Extra Bold", 0, 12)); // NOI18N
+        HapusItemButton.setText("HAPUS ITEM");
+        HapusItemButton.addActionListener(this::HapusItemButtonActionPerformed);
+        add(HapusItemButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 410, 130, 30));
 
-        jTextField1.setBackground(new java.awt.Color(171, 197, 253));
-        jTextField1.setText("....");
-        jTextField1.addActionListener(this::jTextField1ActionPerformed);
-        add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 20, -1, -1));
+        TambahItemButton.setBackground(new java.awt.Color(153, 255, 153));
+        TambahItemButton.setFont(new java.awt.Font("Tw Cen MT Condensed Extra Bold", 0, 12)); // NOI18N
+        TambahItemButton.setText("TAMBAH ITEM");
+        TambahItemButton.addActionListener(this::TambahItemButtonActionPerformed);
+        add(TambahItemButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 410, 130, 30));
+
+        EditItemButton.setBackground(new java.awt.Color(255, 204, 0));
+        EditItemButton.setFont(new java.awt.Font("Tw Cen MT Condensed Extra Bold", 0, 12)); // NOI18N
+        EditItemButton.setText("EDIT ITEM");
+        EditItemButton.addActionListener(this::EditItemButtonActionPerformed);
+        add(EditItemButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 410, 130, 30));
+
+        NomerNota.setBackground(new java.awt.Color(171, 197, 253));
+        NomerNota.setText("....");
+        NomerNota.addActionListener(this::NomerNotaActionPerformed);
+        add(NomerNota, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 20, -1, -1));
 
         Background.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/BackGroundUpdateNota.png"))); // NOI18N
         add(Background, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 600, 460));
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void HomeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HomeButtonActionPerformed
+        DetailNota_2 halamanDetail = new DetailNota_2(selectedNoNota);
+        halamanDetail.setVisible(true);
+        
+        this.dispose();
+    }//GEN-LAST:event_HomeButtonActionPerformed
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+    private void NomerNotaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NomerNotaActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
+    }//GEN-LAST:event_NomerNotaActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton2ActionPerformed
+    private void TambahItemButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TambahItemButtonActionPerformed
+        DefaultTableModel model = (DefaultTableModel) jTable2.getModel();
+        
+        if (!isAddingMode) {
+           
+            isAddingMode = true;
+            TambahItemButton.setText("KONFIRMASI TAMBAH?");
+            
+            EditItemButton.setEnabled(false);
+            HapusItemButton.setEnabled(false);
+            HomeButton.setEnabled(false);
+            
+            model.addRow(new Object[]{0, "", 0, 0, -1});
+            
+            int rowBaru = model.getRowCount() - 1;
+            jTable2.setRowSelectionInterval(rowBaru, rowBaru);
+            
+        } else {
+            int selectedRow = jTable2.getSelectedRow();
+            if (jTable2.isEditing()) {
+                jTable2.getCellEditor().stopCellEditing();
+            }
+            
+            try {
+                int jumlah = Integer.parseInt(model.getValueAt(selectedRow, 0).toString());
+                String namaBarang = model.getValueAt(selectedRow, 1).toString().trim();
+                int hargaSatuan = Integer.parseInt(model.getValueAt(selectedRow, 2).toString());
+                
+                if (namaBarang.isEmpty() || jumlah <= 0 || hargaSatuan <= 0) {
+                    JOptionPane.showMessageDialog(this, "Data barang tidak valid / tidak boleh kosong!", "Peringatan", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                
+                String queryInsert = "INSERT INTO DetailNota (no_nota, nama_barang, jumlah, harga_satuan) VALUES (?, ?, ?, ?)";
+                try (Connection conn = DriverManager.getConnection(url, userDb, passDb);
+                     PreparedStatement ps = conn.prepareStatement(queryInsert)) {
+                    ps.setString(1, selectedNoNota);
+                    ps.setString(2, namaBarang);
+                    ps.setInt(3, jumlah);
+                    ps.setInt(4, hargaSatuan);
+                    ps.executeUpdate();
+                    
+                    JOptionPane.showMessageDialog(this, "Item baru berhasil ditambahkan!");
+                }
+                
+                isAddingMode = false;
+                TambahItemButton.setText("TAMBAH ITEM");
+                EditItemButton.setEnabled(true);
+                HapusItemButton.setEnabled(true);
+                HomeButton.setEnabled(true);
+                
+                loadDetailData(); 
+                
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Input harus angka dan terisi semua!", "Format Salah", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_TambahItemButtonActionPerformed
 
+    private void HapusItemButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HapusItemButtonActionPerformed
+        int selectedRow = jTable2.getSelectedRow();
+        
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Silakan pilih baris item yang ingin dihapus!", "Peringatan", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        int konfirmasi = JOptionPane.showConfirmDialog(this, "Apakah Anda yakin ingin menghapus item ini secara permanen?", "Konfirmasi Hapus", JOptionPane.YES_NO_OPTION);
+        
+        if (konfirmasi == JOptionPane.YES_OPTION) {
+            DefaultTableModel model = (DefaultTableModel) jTable2.getModel();
+            int idDetail = Integer.parseInt(model.getValueAt(selectedRow, 4).toString()); 
+            
+            String queryDelete = "DELETE FROM DetailNota WHERE id_detail = ?";
+            try (Connection conn = DriverManager.getConnection(url, userDb, passDb);
+                 PreparedStatement ps = conn.prepareStatement(queryDelete)) {
+                
+                ps.setInt(1, idDetail);
+                ps.executeUpdate();
+                
+                JOptionPane.showMessageDialog(this, "Item sukses terhapus!");
+                loadDetailData(); 
+                
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(this, "Gagal menghapus data: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_HapusItemButtonActionPerformed
+
+    private void EditItemButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EditItemButtonActionPerformed
+        int selectedRow = jTable2.getSelectedRow();
+        
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Silakan pilih satu baris item yang ingin diedit terlebih dahulu!", "Peringatan", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        DefaultTableModel model = (DefaultTableModel) jTable2.getModel();
+        
+        if (!isEditingMode) {
+            isEditingMode = true;
+            EditItemButton.setText("KONFIRMASI EDIT?");
+            
+            TambahItemButton.setEnabled(false);
+            HapusItemButton.setEnabled(false);
+            HomeButton.setEnabled(false);
+            
+            JOptionPane.showMessageDialog(this, "Silakan klik ganda pada kolom nilai yang ingin diubah pada baris terpilih.");
+            
+        } else {
+            if (jTable2.isEditing()) {
+                jTable2.getCellEditor().stopCellEditing();
+            }
+            
+            try {
+                int jumlah = Integer.parseInt(model.getValueAt(selectedRow, 0).toString());
+                String namaBarang = model.getValueAt(selectedRow, 1).toString().trim();
+                int hargaSatuan = Integer.parseInt(model.getValueAt(selectedRow, 2).toString());
+                int idDetail = Integer.parseInt(model.getValueAt(selectedRow, 4).toString()); // Ambil ID Rahasia
+                
+                if (namaBarang.isEmpty() || jumlah <= 0 || hargaSatuan <= 0) {
+                    JOptionPane.showMessageDialog(this, "Data perubahan tidak boleh kosong!", "Peringatan", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                
+                String queryUpdate = "UPDATE DetailNota SET nama_barang = ?, jumlah = ?, harga_satuan = ? WHERE id_detail = ?";
+                try (Connection conn = DriverManager.getConnection(url, userDb, passDb);
+                     PreparedStatement ps = conn.prepareStatement(queryUpdate)) {
+                    ps.setString(1, namaBarang);
+                    ps.setInt(2, jumlah);
+                    ps.setInt(3, hargaSatuan);
+                    ps.setInt(4, idDetail);
+                    ps.executeUpdate();
+                    
+                    JOptionPane.showMessageDialog(this, "Data item berhasil diperbarui!");
+                }
+                
+                isEditingMode = false;
+                EditItemButton.setText("EDIT ITEM");
+                TambahItemButton.setEnabled(true);
+                HapusItemButton.setEnabled(true);
+                HomeButton.setEnabled(true);
+                
+                loadDetailData(); 
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Gagal menyimpan perubahan: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_EditItemButtonActionPerformed
+    
+    public static void main(String args[]) {
+        java.awt.EventQueue.invokeLater(() -> {
+            new UpdateNota_3().setVisible(true);
+        });
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel Background;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
+    private javax.swing.JButton EditItemButton;
+    private javax.swing.JButton HapusItemButton;
+    private javax.swing.JButton HomeButton;
+    private javax.swing.JTextField NomerNota;
+    private javax.swing.JButton TambahItemButton;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable jTable2;
-    private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 }

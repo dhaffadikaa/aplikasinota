@@ -21,6 +21,10 @@ public class Login_0 extends javax.swing.JFrame {
      */
     public Login_0() {
         initComponents();
+        lblpasswordKonf.setVisible(false); 
+        TFpasswordKonf.setVisible(false); 
+        JudulBuatAkun.setText("LOGIN AKUN"); 
+        SIGNUPBTN.setText("SIGN-IN");
         this.setLocationRelativeTo(null);
         this.setSize(600, 490);
     }
@@ -59,7 +63,6 @@ public class Login_0 extends javax.swing.JFrame {
         getContentPane().add(JudulBuatAkun, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 90, 90, 30));
 
         TFpassword.setFont(new java.awt.Font("Tw Cen MT", 0, 12)); // NOI18N
-        TFpassword.setText("Masukan password disini");
         TFpassword.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, java.awt.Color.lightGray, java.awt.Color.lightGray, null, java.awt.Color.lightGray));
         TFpassword.addActionListener(this::TFpasswordActionPerformed);
         getContentPane().add(TFpassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 220, 200, 20));
@@ -69,7 +72,6 @@ public class Login_0 extends javax.swing.JFrame {
         getContentPane().add(lblpasswordKonf, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 260, -1, -1));
 
         TFpasswordKonf.setFont(new java.awt.Font("Tw Cen MT", 0, 12)); // NOI18N
-        TFpasswordKonf.setText("Masukan ulang password disini");
         TFpasswordKonf.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, java.awt.Color.lightGray, java.awt.Color.lightGray, null, java.awt.Color.lightGray));
         TFpasswordKonf.addActionListener(this::TFpasswordKonfActionPerformed);
         getContentPane().add(TFpasswordKonf, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 280, 200, 20));
@@ -79,7 +81,6 @@ public class Login_0 extends javax.swing.JFrame {
         getContentPane().add(lblpassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 200, -1, -1));
 
         TFusername.setFont(new java.awt.Font("Tw Cen MT", 0, 12)); // NOI18N
-        TFusername.setText("Masukan username disini");
         TFusername.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, java.awt.Color.lightGray, java.awt.Color.lightGray, null, java.awt.Color.lightGray));
         TFusername.addActionListener(this::TFusernameActionPerformed);
         getContentPane().add(TFusername, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 160, 200, 20));
@@ -146,14 +147,13 @@ public class Login_0 extends javax.swing.JFrame {
             ResultSet rs = ps.executeQuery();
             
             if (rs.next()) {
-                int idUser = rs.getInt("id_user"); 
-                JOptionPane.showMessageDialog(this, "Login Berhasil!\nSelamat datang, " + username);
-                
-                ListNota_1 halamanUtama = new ListNota_1();
-                halamanUtama.setVisible(true);
-                this.dispose(); 
-                
-            } else {
+    int idUser = rs.getInt("id_user"); 
+    JOptionPane.showMessageDialog(this, "Login Berhasil!\nSelamat datang, " + username);
+    
+    ListNota_1 halamanUtama = new ListNota_1(idUser);
+    halamanUtama.setVisible(true);
+    this.dispose(); 
+}        else {
       
                 JOptionPane.showMessageDialog(this, "Username atau Password salah!", "Login Gagal", JOptionPane.ERROR_MESSAGE);
             }
