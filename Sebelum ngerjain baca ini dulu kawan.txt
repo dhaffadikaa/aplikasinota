@@ -3,7 +3,7 @@ Halo ini repostitori buat aplikasi nota.
 tolong kasih nama file 
 [No page]_[nama page].java
 contoh : 
-1_ListNota.java
+ListNota_1.java
 
 KALAU NGEPUSH SESUATU NGOMONG DI GRUP
 contoh :
