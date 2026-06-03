@@ -36,12 +36,13 @@ public class TambahNotaBaru_4 extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
         this.setSize(600, 490);
         NomerNotaTF.setText(generateNoNota());
+        this.setResizable(false);
     }
     
     public TambahNotaBaru_4() {
         initComponents();
         this.setLocationRelativeTo(null); 
-        
+        this.setResizable(false);
         NomerNotaTF.setText(generateNoNota());
     }
 

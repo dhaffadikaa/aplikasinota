@@ -20,7 +20,9 @@ public class Login_0 extends javax.swing.JFrame {
      * Creates new form Login_0
      */
     public Login_0() {
+        
         initComponents();
+        this.setResizable(false);
         lblpasswordKonf.setVisible(false); 
         TFpasswordKonf.setVisible(false); 
         JudulBuatAkun.setText("LOGIN AKUN"); 

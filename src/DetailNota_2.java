@@ -30,13 +30,13 @@ public class DetailNota_2 extends javax.swing.JFrame {
         this.setSize(600, 490); 
         this.setLocationRelativeTo(null);
         jTable1.setRowHeight(40);
-        
+        this.setResizable(false);
         loadDetailData();
     }
     public DetailNota_2(String noNota) {
     initComponents();
     this.selectedNoNota = noNota; 
-    
+    this.setResizable(false);
     this.setSize(600, 490); 
     this.setLocationRelativeTo(null);
     
@@ -49,7 +49,7 @@ public class DetailNota_2 extends javax.swing.JFrame {
     public DetailNota_2() {
         
         this.setSize(600, 490); 
-        
+        this.setResizable(false);
         initComponents();    
         jTable1.setRowHeight(40);
         this.setLocationRelativeTo(null);
@@ -198,9 +198,8 @@ public class DetailNota_2 extends javax.swing.JFrame {
     private void UpdateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UpdateButtonActionPerformed
         String noNotaAktif = NoNotaLabel.getText(); 
     
-    UpdateNota_3 halamanUpdate = new UpdateNota_3(noNotaAktif);
-    halamanUpdate.setVisible(true);
-    
+        UpdateNota_3 halamanUpdate = new UpdateNota_3(noNotaAktif, this.loggedInUserId);
+        halamanUpdate.setVisible(true);
     this.dispose();
     }//GEN-LAST:event_UpdateButtonActionPerformed
 

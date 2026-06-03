@@ -21,14 +21,32 @@ public class UpdateNota_3 extends javax.swing.JFrame {
     private final String passDb = "123";
     private boolean isEditingMode = false;
     private boolean isAddingMode = false;
-
+    private int loggedInUserId;
     public UpdateNota_3() {
         initComponents();
         customTableSetup();
         this.setSize(600, 500);
         this.setLocationRelativeTo(null);
+        this.setResizable(false);
     }
-
+    
+    public UpdateNota_3(String noNota, int userId) {
+        initComponents();
+        this.selectedNoNota = noNota;
+        this.loggedInUserId = userId; 
+        
+        customTableSetup();
+        
+        this.setSize(600, 500);
+        this.setLocationRelativeTo(null);
+        
+        NomerNota.setText(selectedNoNota);
+        NomerNota.setEditable(false); 
+        
+        loadDetailData(); 
+        this.setResizable(false);
+    }
+    
     public UpdateNota_3(String noNota) {
         initComponents();
         this.selectedNoNota = noNota;
@@ -41,6 +59,7 @@ public class UpdateNota_3 extends javax.swing.JFrame {
         NomerNota.setEditable(false); 
         
         loadDetailData(); 
+        this.setResizable(false);
     }
     
     private void customTableSetup() {
@@ -182,7 +201,7 @@ public class UpdateNota_3 extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void HomeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HomeButtonActionPerformed
-        DetailNota_2 halamanDetail = new DetailNota_2(selectedNoNota);
+        DetailNota_2 halamanDetail = new DetailNota_2(selectedNoNota, this.loggedInUserId);
         halamanDetail.setVisible(true);
         
         this.dispose();

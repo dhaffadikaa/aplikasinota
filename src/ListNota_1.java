@@ -25,11 +25,13 @@ public class ListNota_1 extends javax.swing.JFrame {
     public ListNota_1(int idUser) {
         this.loggedInUserId = idUser; 
         setupHalamanUtama();
+        this.setResizable(false);
     }
 
     
     public ListNota_1() {
         setupHalamanUtama();
+        this.setResizable(false);
     }
     
     private void setupHalamanUtama() {
